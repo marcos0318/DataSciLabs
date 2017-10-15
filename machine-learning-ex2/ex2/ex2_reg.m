@@ -116,10 +116,10 @@ options = optimset('GradObj', 'on', 'MaxIter', 400);
 [theta, J, exit_flag] = ...
 	fminunc(@(t)(costFunctionReg(t, X, y, lambda)), initial_theta, options);
 
-% Plot Boundary
+% Plot Bcoundary
 plotDecisionBoundary(theta, X, y);
 hold on;
-title(sprintf('lambda = %g', lambda))
+title(sprintf('lambda = %g', lambda))ex2
 
 % Labels and Legend
 xlabel('Microchip Test 1')
