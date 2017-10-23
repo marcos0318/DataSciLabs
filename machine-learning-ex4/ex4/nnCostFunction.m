@@ -39,6 +39,25 @@ Theta2_grad = zeros(size(Theta2));
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
 %
+
+a1 = [ones(m, 1) X];
+z2 = a1 * Theta1';
+a2 = sigmoid(z2);
+a2 = [ones(size(a2,1), 1) a2];
+z3 = a2 * Theta2';
+a3 = sigmoid(z3);
+h = a3;
+yVector = zeros(m,num_labels);
+
+for i = 1:m
+    yVector(i,y(i)) = 1;
+end
+
+% J = 1/m * sum(sum( -1*yVector .*log(a3) - (1 - yVector) .* log(1 - a3)));
+J = 1/m * sum(sum(-1 * yVector .* log(h)-(1-yVector) .* log(1-h))) + lambda/(2*m)* (sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)));
+
+
+
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
 %         the cost function with respect to Theta1 and Theta2 in Theta1_grad and
@@ -54,6 +73,9 @@ Theta2_grad = zeros(size(Theta2));
 %               over the training examples if you are implementing it for the 
 %               first time.
 %
+
+
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
@@ -61,8 +83,35 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
+Theta1NoBias = Theta1(:, 2:end);
+Theta2NoBias = Theta2(:, 2:end);
+delta1 = zeros(size(Theta1));
+delta2 = zeros(size(Theta2));
 
+for t = 1:m
+	a1t = a1(t,:)';
+	a2t = a2(t,:)';
+	sigt = a3(t,:)';
+	yVectorT = yVector(t,:)';
 
+	d3t = sigt - yVectorT;
+
+	z2t = [1; Theta1 * a1t];
+	d2t = Theta2' * d3t .* sigmoidGradient(z2t);
+
+	delta1 = delta1 + d2t(2:end) * a1t';
+	delta2 = delta2 + d3t * a2t';
+end
+
+Theta1ZeroBias = [ zeros(size(Theta1, 1), 1) Theta1NoBias ];
+Theta2ZeroBias = [ zeros(size(Theta2, 1), 1) Theta2NoBias ];
+Theta1_grad = (1 / m) * delta1 + (lambda / m) * Theta1ZeroBias;
+Theta2_grad = (1 / m) * delta2 + (lambda / m) * Theta2ZeroBias;
+
+% =========================================================================
+
+% Unroll gradients
+grad = [Theta1_grad(:) ; Theta2_grad(:)];
 
 
 
